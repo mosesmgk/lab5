@@ -1,82 +1,77 @@
-/* global $ */ /* global URLSearchParams */
+$(document).ready(function () {
 
-$(document).ready(function() {
-    /* event happens when clicking on the favorite icon */
-    
-    $(".favoriteIcon").on("click", function(){
-       
+    $(".favoriteIcon").on("click", function () {
+
         let queryString = window.location.search;
-        let urlParams   = new URLSearchParams(queryString);
-        let keyword     = urlParams.get("keyword");
-        
+        let urlParams = new URLSearchParams(queryString);
+        let keyword = urlParams.get("keyword");
+
         let imageUrl = $(this).prev().attr("src");
 
-       
-       if ($(this).attr("src") == "img/favorite.png"){
-           $(this).attr("src", "img/favorite_on.png");
-           updateFavorite("add", imageUrl, keyword);
-       } 
-       else {
-           $(this).attr("src", "img/favorite.png");
-           updateFavorite("delete", imageUrl);
-       }
-    }); //favorite icon 
+        if ($(this).attr("src") == "img/favorite.png") {
+            $(this).attr("src", "img/favorite_on.png");
+            updateFavorite("add", imageUrl, keyword);
+        } else {
+            $(this).attr("src", "img/favorite.png");
+            updateFavorite("delete", imageUrl);
+        }
+    });
 
-
-    function updateFavorite(action, imageURL, keyword){
+    function updateFavorite(action, imageUrl, keyword) {
         $.ajax({
             method: "get",
             url: "/api/updateFavorites",
-            data : {
+            data: {
                 "action": action,
-                "imageURL":imageURL,
+                "imageUrl": imageUrl,
                 "keyword": keyword
             },
-            success: function(data, status){
+            success: function (data, status) {
+
+            }
+        });
+    }
+
+    //When clicking on any keyword link, 
+    //all corresponding images are displayed 
+    $(".keywordLink").on("click", function () {
+
+        let keyword = $(this).html().trim();
+        $("#keywordSelected").val(keyword);
+        $.ajax({
+            method: "get",
+            url: "/api/getFavorites",
+            data: {
+                "keyword": keyword
+            },
+            success: function (data, status) {
+
+                $("#favorites").html("");
+                let htmlString = "";
+                data.forEach(function (row) {
+                    htmlString += "<img class='image' src='" + row.imageURL + "' width='200' height='200'>";
+                    htmlString += "<img class='favoriteIcon' src='img/favorite_on.png' width='20'>";
+                });
+
+                $("#favorites").append(htmlString);
             }
         });//ajax
-    }//updateFavorite
-    
-    //When clicking on any keyword link, 
-//all corresponding images are displayed 
-$(".keywordLink").on("click", function(){
-                
-  let keyword = $(this).html().trim();  
-  $("#keywordSelected").val(keyword);
-  $.ajax({
-    method: "get",
-       url: "/api/getFavorites",
-      data: {
-              "keyword": keyword
-            },
-    success: function(data, status) {
 
-             $("#favorites").html("");
-             let htmlString = "";
-             data.forEach(function(row){
-                htmlString += "<img class='image' src='"+row.imageURL+"' width='200' height='200'>";
-                htmlString += "<img class='favoriteIcon' src='img/favorite_on.png' width='20'>";
-                });
-                  
-           $("#favorites").append(htmlString);
-        }
-    });//ajax
+    });//keywordLink
 
-});//keywordLink
+    //Event for dynamic content generated when clicking on a keyword    
+    $("#favorites").on("click", ".favoriteIcon", function () {
 
-//Event for dynamic content generated when clicking on a keyword    
-$("#favorites").on("click", ".favoriteIcon", function(){
-            
-  let favorite = $(this).prev().attr("src");
-        
-  if ($(this).attr("src") == 'img/favorite.png') {
-            $(this).attr("src","img/favorite_on.png");
-     updateFavorite("add",favorite, $("#keywordSelected").val());
+        let favorite = $(this).prev().attr("src");
+
+        if ($(this).attr("src") == 'img/favorite.png') {
+            $(this).attr("src", "img/favorite_on.png");
+            updateFavorite("add", favorite, $("#keywordSelected").val());
         } else {
-            $(this).attr("src","img/favorite.png");
-     updateFavorite("delete",favorite);
-   }
-});//.favoriteIcon
+            $(this).attr("src", "img/favorite.png");
+            updateFavorite("delete", favorite);
+        }
+    });//.favoriteIcon
 
 
-});// ready 
+});
