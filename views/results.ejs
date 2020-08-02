@@ -14,7 +14,7 @@
         <div id="resultsContainer">
             <% imageUrlArray.forEach(function(imageUrl, i){ %>
             <%- (i % 3 === 0)?'<br>':'' %>
-            <img src='<%= imageUrlArray[i] %>' width="200" height="200" />
+            <img src='<%= imageURLArray[i] %>' width="200" height="200" />
             <img class="favoriteIcon" src='img/favorite.png' width="20">
             <% }); %>
         </div>
